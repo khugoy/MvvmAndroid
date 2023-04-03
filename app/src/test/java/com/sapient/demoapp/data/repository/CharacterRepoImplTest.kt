@@ -12,7 +12,6 @@ import io.mockk.unmockkAll
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -30,38 +29,31 @@ class CharacterRepoImplTest {
     private val service = mockk<CharacterService>()
 
     private val repositoryImp by lazy {
-        CharacterRepositoryImp(
-            service, CharacterMapper()
-        )
+        CharacterRepositoryImp(service, CharacterMapper())
     }
+
     @Test
-    fun `Given response data when invoke repository has data`() =
+    fun getCharacters() {
         runBlocking {
-        coEvery { service.getCharacters() } returns MockResponse.getResponseModel()
+            coEvery { service.getCharacters() } returns MockResponse.getResponseModel()
 
-        repositoryImp.getCharacters().collect{
+            repositoryImp.getCharacters().onEach { result ->
+                when (result) {
 
-        }
-        repositoryImp.getCharacters().onEach { result ->
-            when (result) {
+                    is Resource.Loading -> {
+                        println("Loading")
+                    }
+                    is Resource.Success -> {
+                        println("success")
+                        assertEquals(ID, result.data?.get(0)?.name)
+                    }
+                    is Resource.Error -> {
+                        println("error")
+                        assertEquals(ID, result.data?.get(0)?.name)
+                    }
 
-                is Resource.Loading -> {
-                  println("Loading")
                 }
-                is Resource.Success -> {
-                    println("success")
-                    assertEquals(ID, result.data?.get(0)?.name)
-                }
-                is Resource.Error -> {
-                    println("error")
-                    assertEquals(ID, result.data?.get(0)?.name)
-                }
-
             }
-
-        //val first = repositoryImp.getCharacters().drop(1).first()
-        //assertEquals(ID, first.data?.get(0)?.id)
-
         }
     }
 

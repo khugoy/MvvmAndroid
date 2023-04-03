@@ -2,12 +2,12 @@ package com.sapient.demoapp.data.repository
 
 import com.sapient.demoapp.data.api.CharacterService
 import com.sapient.demoapp.data.mapper.CharacterMapper
+import com.sapient.demoapp.domain.models.Character
 import com.sapient.demoapp.domain.repository.CharacterRepository
+import com.sapient.demoapp.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
-import com.sapient.demoapp.domain.models.Character
-import com.sapient.demoapp.domain.util.Resource
 
 class CharacterRepositoryImp @Inject constructor(
     private val service: CharacterService,

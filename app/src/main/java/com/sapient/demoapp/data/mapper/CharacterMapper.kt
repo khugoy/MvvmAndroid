@@ -2,8 +2,8 @@ package com.sapient.demoapp.data.mapper
 
 
 import com.sapient.demoapp.data.dto.CharacterDto
-import javax.inject.Inject
 import com.sapient.demoapp.domain.models.Character
+import javax.inject.Inject
 
 class CharacterMapper @Inject constructor() : Mapper<CharacterDto, Character> {
     override fun mapFromModel(type: CharacterDto): Character {

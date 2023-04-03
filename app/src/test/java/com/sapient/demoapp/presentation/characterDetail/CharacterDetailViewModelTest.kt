@@ -1,6 +1,5 @@
 package com.sapient.demoapp.presentation.characterDetail
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.sapient.demoapp.core.MockResponse
 import com.sapient.demoapp.core.MockResponse.ID
 import com.sapient.demoapp.core.TestCoroutineRule
@@ -16,7 +15,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 

@@ -40,15 +40,6 @@ class CharacterListUseCaseTest {
         assertEquals(ID, first.data?.get(0)?.id)
     }
 
-//    @Test
-//    fun `Given http error when invoke  use case expect null data`() = runTest {
-//        coEvery { characterRepository.getCharacters() }.throws(Throwable("Test"))
-//
-//        val first = characterListUseCase.invoke(Unit).first()
-//
-//        Assert.assertNull(first.data)
-//    }
-
     @After
     fun tearDown(){
         unmockkAll()

@@ -1,8 +1,8 @@
 package com.sapient.demoapp.domain.repository
 
-import kotlinx.coroutines.flow.Flow
 import com.sapient.demoapp.domain.models.Character
 import com.sapient.demoapp.domain.util.Resource
+import kotlinx.coroutines.flow.Flow
 
 interface CharacterRepository {
     suspend fun getCharacters(): Flow<Resource<List<Character>>>
