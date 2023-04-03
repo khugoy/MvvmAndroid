@@ -1,1 +1,1 @@
-# MvvmAndroid
+# Sample app for MVVM clean architecture Android
