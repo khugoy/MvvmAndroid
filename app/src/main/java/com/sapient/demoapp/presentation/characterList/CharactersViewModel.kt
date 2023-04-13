@@ -3,14 +3,12 @@ package com.sapient.demoapp.presentation.characterList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapient.demoapp.domain.interactor.GetCharacterListUseCase
-import com.sapient.demoapp.domain.models.Character
+import com.sapient.demoapp.domain.models.CharacterDomainModel
 import com.sapient.demoapp.domain.util.Resource
-import com.sapient.demoapp.presentation.model.UIState
+import com.sapient.demoapp.presentation.viewState.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,34 +17,29 @@ class CharactersViewModel @Inject constructor(
     private val characterListUseCase: GetCharacterListUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UIState())
-    val state: StateFlow<UIState> = _state
+    private val _characterList =
+        MutableStateFlow<UIState<List<CharacterDomainModel>>>(UIState.Loading(true))
+    val characterList get() = _characterList
 
-    var characterList: MutableList<Character> = mutableListOf()
-
-    init {
-        getCharacterList()
-    }
-
-    private fun getCharacterList() {
+    fun getCharacterList() {
         viewModelScope.launch {
-            characterListUseCase(Unit).onEach { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        _state.value = UIState(isLoading = true)
-                    }
-
-                    is Resource.Success -> {
-                        result.data?.onEach { character -> characterList.add(character) }
-                        _state.value = UIState(isLoading = false, characterList = characterList)
-                    }
-
-                    is Resource.Error -> {
-                        _state.value = UIState(isLoading = false, error = result.message)
-                    }
-
+            characterListUseCase().map {
+                when (it) {
+                    is Resource.OnSuccess -> UIState.Success(it.data)
+                    is Resource.OnFailure -> UIState.Failure(it.throwable)
                 }
-            }.launchIn(this)
+            }.collect {
+                when (it) {
+                    is UIState.Loading -> _characterList.value = UIState.Loading(false)
+                    is UIState.Failure -> _characterList.value = it
+                    is UIState.Success -> {
+                        it.output.let { characters ->
+                            _characterList.value = UIState.Success(characters)
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

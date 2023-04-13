@@ -1,30 +1,37 @@
 package com.sapient.demoapp.presentation.characterList
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.RequestManager
 import com.sapient.demoapp.databinding.ItemCharacterBinding
-import com.sapient.demoapp.domain.models.Character
+import com.sapient.demoapp.domain.models.CharacterDomainModel
+import com.sapient.demoapp.presentation.image.loadImage
 
-class CharactersAdapter(
-    private val listener: CharacterItemListener,
-    private val glide: RequestManager
-    ) : RecyclerView.Adapter<CharactersAdapter.CharacterViewHolder>() {
+typealias CharacterItemListener = (Int) -> Unit
 
-    interface CharacterItemListener {
-        fun onClickedCharacter(characterId: Int)
+class CharactersAdapter(private val listener: CharacterItemListener) :
+    RecyclerView.Adapter<CharacterViewHolder>() {
+
+    private val differCallback = object : DiffUtil.ItemCallback<CharacterDomainModel>() {
+        override fun areItemsTheSame(
+            oldItem: CharacterDomainModel,
+            newItem: CharacterDomainModel
+        ): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(
+            oldItem: CharacterDomainModel,
+            newItem: CharacterDomainModel
+        ): Boolean {
+            return oldItem == newItem
+        }
     }
 
-    private var items = mutableListOf<Character>()
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun setItems(items: MutableList<Character>) {
-        this.items = items
-        notifyDataSetChanged()
-    }
+    val differ = AsyncListDiffer(this, differCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharacterViewHolder {
         val binding: ItemCharacterBinding =
@@ -32,34 +39,40 @@ class CharactersAdapter(
         return CharacterViewHolder(binding, listener)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int {
+        return differ.currentList.size
+    }
 
-    override fun onBindViewHolder(holder: CharacterViewHolder, position: Int) =
-        holder.bind(items[position])
+    override fun onBindViewHolder(holder: CharacterViewHolder, position: Int) {
+        val character = differ.currentList[position]
+        holder.bind(character)
+    }
+}
 
+class CharacterViewHolder(
+    private val itemBinding: ItemCharacterBinding,
+    private val listener: CharacterItemListener
+) : RecyclerView.ViewHolder(itemBinding.root),
+    View.OnClickListener {
 
-    inner class CharacterViewHolder(
-        private val itemBinding: ItemCharacterBinding,
-        private val listener: CharactersAdapter.CharacterItemListener
-    ) : RecyclerView.ViewHolder(itemBinding.root),
-        View.OnClickListener {
+    private lateinit var character: CharacterDomainModel
 
-        private lateinit var character: Character
+    init {
+        itemBinding.root.setOnClickListener(this)
+    }
 
-        init {
-            itemBinding.root.setOnClickListener(this)
-        }
-
-        fun bind(item: Character) {
-            this.character = item
-            itemBinding.name.text = item.name
-            itemBinding.speciesAndStatus.text = """${item.species} - ${item.status}"""
-            glide.load(item.image).into(itemBinding.image)
-        }
-
-        override fun onClick(v: View?) {
-            listener.onClickedCharacter(character.id)
+    fun bind(item: CharacterDomainModel) {
+        this.character = item
+        with(itemBinding) {
+            name.text = item.name
+            speciesAndStatus.text = "${item.species} - ${item.status}"
+            image.loadImage(item.image)
         }
     }
+
+    override fun onClick(v: View?) {
+        listener.invoke(character.id)
+    }
+
 }
 

@@ -3,14 +3,11 @@ package com.sapient.demoapp.presentation.characterDetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapient.demoapp.domain.interactor.GetCharacterByIdUseCase
-import com.sapient.demoapp.domain.models.Character
+import com.sapient.demoapp.domain.models.CharacterDomainModel
 import com.sapient.demoapp.domain.util.Resource
-import com.sapient.demoapp.presentation.model.UIState
+import com.sapient.demoapp.presentation.viewState.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,33 +16,29 @@ class CharacterDetailViewModel @Inject constructor(
     private val characterByIdUseCase: GetCharacterByIdUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UIState(isLoading = true))
-    val state: StateFlow<UIState> = _state
+    private val _characterDetail =
+        MutableStateFlow<UIState<CharacterDomainModel>>(UIState.Loading(true))
+    val characterDetail get() = _characterDetail
 
-    fun start(id: Int) {
-        getCharacter(id)
-    }
-
-    private fun getCharacter(characterId: Int) {
-        var character: Character? = null
+    fun getCharacter(characterId: Int) {
         viewModelScope.launch {
-            characterByIdUseCase(characterId).onEach { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        _state.value = UIState(isLoading = true)
+            characterByIdUseCase(characterId)
+                .map {
+                    when (it) {
+                        is Resource.OnSuccess -> UIState.Success(it.data)
+                        is Resource.OnFailure -> UIState.Failure(it.throwable)
                     }
-
-                    is Resource.Success -> {
-                        result.data?.let { it-> character = it }
-                        _state.value = UIState(isLoading = false, character = character)
+                }.collect {
+                    when (it) {
+                        is UIState.Loading -> _characterDetail.value = UIState.Loading(false)
+                        is UIState.Failure -> _characterDetail.value = it
+                        is UIState.Success -> {
+                            it.output.let { character ->
+                                _characterDetail.value = UIState.Success(character)
+                            }
+                        }
                     }
-
-                    is Resource.Error -> {
-                        _state.value = UIState(isLoading = false, error = result.message)
-                    }
-
                 }
-            }.launchIn(this)
         }
     }
 

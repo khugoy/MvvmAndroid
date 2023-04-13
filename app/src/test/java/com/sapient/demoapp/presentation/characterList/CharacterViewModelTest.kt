@@ -1,10 +1,15 @@
 package com.sapient.demoapp.presentation.characterList
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.sapient.demoapp.core.MockResponse
+import com.google.gson.Gson
+import com.sapient.demoapp.constant.AppConstants
+import com.sapient.demoapp.core.MockFileReader
 import com.sapient.demoapp.core.TestCoroutineRule
+import com.sapient.demoapp.data.mapper.CharacterMapper
+import com.sapient.demoapp.data.models.CharacterResponseDataModel
 import com.sapient.demoapp.domain.interactor.GetCharacterListUseCase
 import com.sapient.demoapp.domain.util.Resource
+import com.sapient.demoapp.presentation.viewState.UIState
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.unmockkAll
@@ -34,26 +39,50 @@ class CharacterViewModelTest {
         CharactersViewModel(useCase)
     }
 
+    private val fileName = "/characterList.json"
+
 
     @Test
-    fun `GET character List success`() = runTest {
-        coEvery { useCase.invoke(Unit) } returns MockResponse.getListData()
-        val result = viewModel.state.value.characterList
-        assertEquals(1, result.size)
+    fun `GET character success`() = runTest {
+
+        val listModel = Gson().fromJson(
+                MockFileReader().getResponseFromJson(fileName), CharacterResponseDataModel::class.java)
+
+        val characterMapper = CharacterMapper()
+
+        val characterList = listModel.results.map { characterEntity ->
+            characterMapper.mapFromModel(characterEntity)
+        }
+
+
+        val flow = flow {
+            emit(Resource.OnSuccess(characterList))
+        }
+
+        coEvery { useCase.invoke() } returns flow
+
+        viewModel.getCharacterList()
+
+        val result = viewModel.characterList.value as UIState.Success
+
+        assertEquals(2, result.output.size)
+
     }
 
     @Test
-    fun `GET character List loading`() = runTest {
-        coEvery { useCase.invoke(Unit) } returns  flow { emit(Resource.Loading()) }
-        val result = viewModel.state.value.isLoading
-        assertEquals(true, result)
-    }
+    fun `GET character list failure`() = runTest {
 
-    @Test
-    fun `GET character List error`() = runTest {
-        coEvery { useCase.invoke(Unit) } returns flow { emit(Resource.Error("Error")) }
-        val result = viewModel.state.value.isLoading
-        assertEquals(false, result)
+        val flow = flow {
+            emit(Resource.OnFailure(Throwable(AppConstants.NETWORK_ERROR)))
+        }
+
+        coEvery { useCase.invoke() } returns flow
+
+        viewModel.getCharacterList()
+
+        val result = viewModel.characterList.value as UIState.Failure
+
+        assertEquals(AppConstants.NETWORK_ERROR, result.throwable.message)
     }
 
     @After
