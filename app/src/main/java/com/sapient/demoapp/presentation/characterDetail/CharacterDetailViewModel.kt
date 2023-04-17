@@ -7,13 +7,16 @@ import com.sapient.demoapp.domain.models.CharacterDomainModel
 import com.sapient.demoapp.domain.util.Resource
 import com.sapient.demoapp.presentation.viewState.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CharacterDetailViewModel @Inject constructor(
-    private val characterByIdUseCase: GetCharacterByIdUseCase
+    private val characterByIdUseCase: GetCharacterByIdUseCase,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     private val _characterDetail =
@@ -21,7 +24,7 @@ class CharacterDetailViewModel @Inject constructor(
     val characterDetail get() = _characterDetail
 
     fun getCharacter(characterId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(defaultDispatcher) {
             characterByIdUseCase(characterId)
                 .map {
                     when (it) {

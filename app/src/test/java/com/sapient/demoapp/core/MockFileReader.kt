@@ -15,4 +15,15 @@ class MockFileReader {
         val source = inputStream?.source()?.buffer()
         return source?.readString(StandardCharsets.UTF_8)
     }
+
+    companion object {
+         val ID = 1
+         val detail_fileName = "/characterDetail.json"
+         val list_fileName = "/characterList.json"
+         val ALIVE = "Alive"
+         val ONE = 1
+         val TWO = 2
+         val NETWORK_ERROR = "Network Error"
+    }
 }
+

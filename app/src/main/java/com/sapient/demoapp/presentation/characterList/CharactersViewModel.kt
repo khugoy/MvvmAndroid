@@ -7,6 +7,8 @@ import com.sapient.demoapp.domain.models.CharacterDomainModel
 import com.sapient.demoapp.domain.util.Resource
 import com.sapient.demoapp.presentation.viewState.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -14,21 +16,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CharactersViewModel @Inject constructor(
-    private val characterListUseCase: GetCharacterListUseCase
+    private val characterListUseCase: GetCharacterListUseCase,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
+
 
     private val _characterList =
         MutableStateFlow<UIState<List<CharacterDomainModel>>>(UIState.Loading(true))
     val characterList get() = _characterList
 
     fun getCharacterList() {
-        viewModelScope.launch {
+        viewModelScope.launch(defaultDispatcher) {
             characterListUseCase().map {
                 when (it) {
                     is Resource.OnSuccess -> UIState.Success(it.data)
                     is Resource.OnFailure -> UIState.Failure(it.throwable)
                 }
-            }.collect {
+            } .collect {
                 when (it) {
                     is UIState.Loading -> _characterList.value = UIState.Loading(false)
                     is UIState.Failure -> _characterList.value = it

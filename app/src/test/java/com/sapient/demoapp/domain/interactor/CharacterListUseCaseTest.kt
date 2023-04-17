@@ -1,6 +1,6 @@
 package com.sapient.demoapp.domain.interactor
 
-import com.sapient.demoapp.core.TestCoroutineRule
+import com.sapient.demoapp.core.MockFileReader
 import com.sapient.demoapp.data.repository.CharacterRepositoryImp
 import com.sapient.demoapp.domain.models.CharacterDomainModel
 import com.sapient.demoapp.domain.util.Resource
@@ -21,9 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class CharacterListUseCaseTest {
-
-    @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
 
     private val characterRepository = mockk<CharacterRepositoryImp>()
 
@@ -50,7 +47,7 @@ class CharacterListUseCaseTest {
     fun `fetch failure data`() = runTest {
 
         val flow = flow {
-            emit(Resource.OnFailure(Throwable("Error")))
+            emit(Resource.OnFailure(Throwable(MockFileReader.NETWORK_ERROR)))
         }
 
         coEvery { characterRepository.getCharacters() } returns flow

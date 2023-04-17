@@ -1,7 +1,6 @@
 package com.sapient.demoapp.presentation.characterDetail
 
 import com.google.gson.Gson
-import com.sapient.demoapp.constant.AppConstants
 import com.sapient.demoapp.core.MockFileReader
 import com.sapient.demoapp.core.TestCoroutineRule
 import com.sapient.demoapp.domain.interactor.GetCharacterByIdUseCase
@@ -30,10 +29,6 @@ class CharacterDetailViewModelTest {
 
     private val useCase = mockk<GetCharacterByIdUseCase>()
 
-    private val ID = 1
-
-    private val fileName = "/characterDetail.json"
-
     private val viewModel: CharacterDetailViewModel by lazy {
         CharacterDetailViewModel(useCase)
     }
@@ -42,7 +37,7 @@ class CharacterDetailViewModelTest {
     fun `GET character detail success`() = runTest {
 
         val detailModel = Gson().fromJson(
-            MockFileReader().getResponseFromJson(fileName),
+            MockFileReader().getResponseFromJson(MockFileReader.detail_fileName),
             CharacterDomainModel::class.java
         )
 
@@ -50,26 +45,26 @@ class CharacterDetailViewModelTest {
             emit(Resource.OnSuccess(detailModel))
         }
 
-        coEvery { useCase.invoke(ID) } returns flow
+        coEvery { useCase.invoke(MockFileReader.ID) } returns flow
 
-        viewModel.getCharacter(ID)
+        viewModel.getCharacter(MockFileReader.ID)
 
         val result  = viewModel.characterDetail.value as UIState.Success
 
-        assertEquals(1, result.output.id)
-        assertEquals("Alive", result.output.status)
+        assertEquals(MockFileReader.ONE, result.output.id)
+        assertEquals(MockFileReader.ALIVE, result.output.status)
     }
 
     @Test
     fun `GET character List error`() = runTest {
-        coEvery { useCase.invoke(ID) } returns flow {
-            emit(Resource.OnFailure(Throwable(AppConstants.NETWORK_ERROR)))
+        coEvery { useCase.invoke(MockFileReader.ID) } returns flow {
+            emit(Resource.OnFailure(Throwable(MockFileReader.NETWORK_ERROR)))
         }
 
-        viewModel.getCharacter(ID)
+        viewModel.getCharacter(MockFileReader.ID)
         val result = viewModel.characterDetail.value as UIState.Failure
 
-        assertEquals(AppConstants.NETWORK_ERROR, result.throwable.message)
+        assertEquals(MockFileReader.NETWORK_ERROR, result.throwable.message)
     }
 
     @After

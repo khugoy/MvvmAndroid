@@ -1,7 +1,6 @@
 package com.sapient.demoapp.data.api
 
 
-import com.sapient.demoapp.constant.AppConstants
 import com.sapient.demoapp.data.models.CharacterDataModel
 import com.sapient.demoapp.data.models.CharacterResponseDataModel
 import retrofit2.http.GET
@@ -12,5 +11,5 @@ interface CharacterService {
     suspend fun getCharacters() : CharacterResponseDataModel
 
     @GET("character/{id}")
-    suspend fun getCharacter(@Path(AppConstants.ID) id: Int): CharacterDataModel
+    suspend fun getCharacter(@Path("id") id: Int): CharacterDataModel
 }

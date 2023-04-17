@@ -2,7 +2,6 @@ package com.sapient.demoapp.presentation.characterList
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.gson.Gson
-import com.sapient.demoapp.constant.AppConstants
 import com.sapient.demoapp.core.MockFileReader
 import com.sapient.demoapp.core.TestCoroutineRule
 import com.sapient.demoapp.data.mapper.CharacterMapper
@@ -39,14 +38,12 @@ class CharacterViewModelTest {
         CharactersViewModel(useCase)
     }
 
-    private val fileName = "/characterList.json"
-
 
     @Test
     fun `GET character success`() = runTest {
 
         val listModel = Gson().fromJson(
-                MockFileReader().getResponseFromJson(fileName), CharacterResponseDataModel::class.java)
+                MockFileReader().getResponseFromJson(MockFileReader.list_fileName), CharacterResponseDataModel::class.java)
 
         val characterMapper = CharacterMapper()
 
@@ -65,7 +62,7 @@ class CharacterViewModelTest {
 
         val result = viewModel.characterList.value as UIState.Success
 
-        assertEquals(2, result.output.size)
+        assertEquals(MockFileReader.TWO, result.output.size)
 
     }
 
@@ -73,7 +70,7 @@ class CharacterViewModelTest {
     fun `GET character list failure`() = runTest {
 
         val flow = flow {
-            emit(Resource.OnFailure(Throwable(AppConstants.NETWORK_ERROR)))
+            emit(Resource.OnFailure(Throwable(MockFileReader.NETWORK_ERROR)))
         }
 
         coEvery { useCase.invoke() } returns flow
@@ -82,7 +79,7 @@ class CharacterViewModelTest {
 
         val result = viewModel.characterList.value as UIState.Failure
 
-        assertEquals(AppConstants.NETWORK_ERROR, result.throwable.message)
+        assertEquals(MockFileReader.NETWORK_ERROR, result.throwable.message)
     }
 
     @After

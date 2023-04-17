@@ -25,7 +25,7 @@ class CharacterRepositoryImp @Inject constructor(
         } catch (e: Exception) {
             emit(Resource.OnFailure(e))
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
     override suspend fun getCharacter(characterId: Int): Flow<Resource<CharacterDomainModel>> = flow {
         try {
@@ -34,5 +34,5 @@ class CharacterRepositoryImp @Inject constructor(
         } catch (e: Exception) {
             emit(Resource.OnFailure(e))
         }
-    }.flowOn(Dispatchers.IO)
+    }
 }

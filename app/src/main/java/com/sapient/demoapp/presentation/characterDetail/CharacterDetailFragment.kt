@@ -9,9 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.sapient.demoapp.constant.AppConstants
 import com.sapient.demoapp.databinding.CharacterDetailFragmentBinding
 import com.sapient.demoapp.domain.models.CharacterDomainModel
+import com.sapient.demoapp.presentation.characterList.CharactersFragment
 import com.sapient.demoapp.presentation.extensions.showProgressBar
 import com.sapient.demoapp.presentation.extensions.snackBar
 import com.sapient.demoapp.presentation.image.loadImage
@@ -34,7 +34,7 @@ class CharacterDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.getInt(AppConstants.ID)?.let {
+        arguments?.getInt(CharactersFragment.ID)?.let {
             viewModel.getCharacter(it)
         }
 
@@ -55,7 +55,7 @@ class CharacterDetailFragment : Fragment() {
                         }
                         is UIState.Failure -> {
                             binding.progressBar.showProgressBar(false)
-                            snackBar(AppConstants.NETWORK_ERROR)
+                            snackBar(CharactersFragment.NETWORK_ERROR)
                         }
                     }
                 }
@@ -63,13 +63,13 @@ class CharacterDetailFragment : Fragment() {
         }
     }
 
-    private fun bindCharacter(character: CharacterDomainModel?) {
+    private fun bindCharacter(character: CharacterDomainModel) {
         with(binding) {
-            name.text = character?.name
-            species.text = character?.species
-            status.text = character?.status
-            gender.text = character?.gender
-            image.loadImage(character?.image)
+            name.text = character.name
+            species.text = character.species
+            status.text = character.status
+            gender.text = character.gender
+            image.loadImage(character.image)
         }
     }
 }

@@ -13,7 +13,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sapient.demoapp.R
-import com.sapient.demoapp.constant.AppConstants
 import com.sapient.demoapp.databinding.CharactersFragmentBinding
 import com.sapient.demoapp.presentation.extensions.showProgressBar
 import com.sapient.demoapp.presentation.extensions.snackBar
@@ -24,19 +23,10 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CharactersFragment : Fragment() {
 
+
     private lateinit var binding: CharactersFragmentBinding
     private val viewModel: CharactersViewModel by viewModels()
-    private lateinit var adapter: CharactersAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        adapter = CharactersAdapter { characterId ->
-            findNavController().navigate(
-                R.id.action_charactersFragment_to_characterDetailFragment,
-                bundleOf(AppConstants.ID to characterId)
-            )
-        }
-    }
+    private val adapter = CharactersAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +39,13 @@ class CharactersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+
+        adapter.setOnItemClickListener {
+            findNavController().navigate(
+                R.id.action_charactersFragment_to_characterDetailFragment,
+                bundleOf(ID to it.id)
+            )
+        }
         viewModel.getCharacterList()
         initObservers()
     }
@@ -72,16 +69,21 @@ class CharactersFragment : Fragment() {
                         is UIState.Success -> {
                             binding.progressBar.showProgressBar(false)
                             it.let { data ->
-                                adapter?.differ?.submitList(data.output)
+                                adapter.characterList.submitList(data.output)
                             }
                         }
                         is UIState.Failure -> {
                             binding.progressBar.showProgressBar(false)
-                            snackBar(AppConstants.NETWORK_ERROR)
+                            snackBar(NETWORK_ERROR)
                         }
                     }
                 }
             }
         }
     }
+    companion object {
+        val ID = "id"
+        val NETWORK_ERROR = "Network Error"
+    }
+
 }
