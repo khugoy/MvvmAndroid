@@ -9,7 +9,7 @@ import com.sapient.demoapp.databinding.ItemCharacterBinding
 import com.sapient.demoapp.domain.models.CharacterDomainModel
 import com.sapient.demoapp.presentation.image.loadImage
 
-class CharactersAdapter : RecyclerView.Adapter<CharacterViewHolder>() {
+ class CharactersAdapter : RecyclerView.Adapter<CharacterViewHolder>() {
 
     private lateinit var binding: ItemCharacterBinding
 

@@ -12,6 +12,7 @@ import com.sapient.demoapp.presentation.viewState.UIState
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.unmockkAll
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -35,7 +36,7 @@ class CharacterViewModelTest {
     private val useCase = mockk<GetCharacterListUseCase>()
 
     private val viewModel: CharactersViewModel by lazy {
-        CharactersViewModel(useCase)
+        CharactersViewModel(useCase, Dispatchers.Main)
     }
 
 

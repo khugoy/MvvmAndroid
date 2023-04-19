@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CharactersFragment : Fragment() {
 
-
     private lateinit var binding: CharactersFragmentBinding
     private val viewModel: CharactersViewModel by viewModels()
     private val adapter = CharactersAdapter()

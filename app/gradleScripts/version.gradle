@@ -1,0 +1,24 @@
+ext {
+
+    junit = '4.13.2'
+    mockk = '1.12.3'
+    coreTesting = '2.2.0'
+    kotlinxCoroutinesTest = '1.6.4'
+
+    coreKtx = '1.9.0'
+    appcompat = '1.6.1'
+    material = '1.8.0'
+    constraintlayout = '2.1.4'
+    fragmentKtx = '1.5.5'
+    navigationFragmentKtx = '2.5.3'
+    navigationUIKtx = '2.5.3'
+    viewModelLifecycle = '2.4.0'
+
+    hiltAdroid = '2.38.1'
+    hiltLifecycleViewmodel = '1.0.0-alpha03'
+    hiltCompiler = '1.0.0'
+    retrofit = '2.9.0'
+    coroutines = '1.6.4'
+    loggingInterceptor = '5.0.0-alpha.2'
+    glide = '4.12.0'
+}

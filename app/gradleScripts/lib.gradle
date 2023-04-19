@@ -1,0 +1,44 @@
+apply from: "gradleScripts/version.gradle"
+
+ext {
+
+}
+
+// androidx libraries
+def androidX = [:]
+androidX.coreKtx = "androidx.core:core-ktx:$coreKtx"
+androidX.appcompat = "androidx.appcompat:appcompat:$appcompat"
+androidX.material = "com.google.android.material:material:$material"
+androidX.constraintlayout = "androidx.constraintlayout:constraintlayout:$constraintlayout"
+androidX.fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtx"
+androidX.navigationFragmentKtx = "androidx.navigation:navigation-fragment-ktx:$navigationFragmentKtx"
+androidX.navigationUIKtx = "androidx.navigation:navigation-ui-ktx:$navigationUIKtx"
+androidX.lifecycle = "androidx.lifecycle:lifecycle-viewmodel-ktx:$viewModelLifecycle"
+ext.androidX = androidX
+
+def hilt= [:]
+hilt.hiltAdroid = "com.google.dagger:hilt-android:$hiltAdroid"
+hilt.hiltAnnotationCompiler = "com.google.dagger:hilt-compiler:$hiltAdroid"
+hilt.hiltLifecycleViewmodel = "androidx.hilt:hilt-lifecycle-viewmodel:$hiltLifecycleViewmodel"
+hilt.hiltCompiler = "androidx.hilt:hilt-compiler:$hiltCompiler"
+ext.hilt = hilt
+
+def network = [:]
+network.retrofit = "com.squareup.retrofit2:retrofit:$retrofit"
+network.gson =  "com.squareup.retrofit2:converter-gson:$retrofit"
+network.loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$loggingInterceptor"
+network.coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
+network.coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
+ext.network = network
+
+def glidelib = [:]
+glidelib.glide = "com.github.bumptech.glide:glide:$glide"
+glidelib.glideCompiler = "com.github.bumptech.glide:compiler:$glide"
+ext.glidelib = glidelib
+
+def unitTest = [:]
+unitTest.junit = "junit:junit:$junit"
+unitTest.mockk = "io.mockk:mockk:$mockk"
+unitTest.coreTesting = "androidx.arch.core:core-testing:$coreTesting"
+unitTest.kotlinxCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinxCoroutinesTest"
+ext.unitTest = unitTest
